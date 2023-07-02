@@ -17,23 +17,23 @@
 
 #include "GstCameraPlugin.hh"
 
-#include <gz/sensors/DepthCameraSensor.hh>
 #include <gst/app/gstappsrc.h>
+#include <gz/plugin/Register.hh>
 
 #include <math.h>
 #include <string>
 #include <iostream>
 #include <thread>
 #include <time.h>
-// #include "Int32.pb.h"
 
 #include <opencv2/opencv.hpp>
 
 using namespace std;
-using namespace gazebo;
+using namespace gz;
 using namespace cv;
 
-GZ_REGISTER_SENSOR_PLUGIN(GstCameraPlugin)
+
+GZ_ADD_PLUGIN(GstCameraPlugin)
 
 
 static void* start_thread(void* param) {
@@ -161,13 +161,6 @@ void GstCameraPlugin::Load(sensors::SensorPtr sensor, sdf::ElementPtr sdf)
     gzerr << "Invalid sensor pointer.\n";
 
   this->parentSensor = std::dynamic_pointer_cast<sensors::CameraSensor>(sensor);
-
-  if (!this->parentSensor)
-  {
-    gzerr << "GstCameraPlugin requires a CameraSensor.\n";
-    if (std::dynamic_pointer_cast<sensors::DepthCameraSensor>(sensor))
-      gzmsg << "It is a depth camera sensor\n";
-  }
 
   this->camera = this->parentSensor->GetCamera();
 

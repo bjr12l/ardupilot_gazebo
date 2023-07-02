@@ -14,24 +14,24 @@
  * limitations under the License.
  *
 */
-#pragma once
-
 #include <string>
 #include <mutex>
 
-#include <gz/plugin/Plugin.hh>
+#include <gz/sensors/SensorFactory.hh>
 #include <gz/sensors/CameraSensor.hh>
-#include <ignition/gazebo.hh>
-#include <gz/common.hh>
+#include <gz/sensors/SensorTypes.hh>
+#include <gz/sim/Export.hh>
+#include <gz/common/Event.hh>
 #include <gz/rendering/Camera.hh>
-// #include <gz/util/system.hh>
-// #include <gz/transport/transport.hh>
-#include <gz/msgs.hh>
+#include <gz/transport/Node.hh>
+#include <gz/transport/SubscribeOptions.hh>
+#include <gz/msgs/int32.pb.h>
 
+#include <boost/shared_ptr.hpp>
 #include <gst/gst.h>
 
-namespace gazebo
-{
+using namespace gz;
+
 /**
  * @class GstCameraPlugin
  * A Gazebo plugin that can be attached to a camera and then streams the video data using gstreamer.
@@ -40,8 +40,8 @@ namespace gazebo
  * Connect to the stream via command line with:
  * gst-launch-1.0  -v udpsrc port=5600 caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' \
  *  ! rtph264depay ! avdec_h264 ! videoconvert ! autovideosink fps-update-interval=1000 sync=false
- */
-class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
+ **/
+class GZ_SIM_VISIBLE GstCameraPlugin : public sensors::SensorPlugin
 {
   public: GstCameraPlugin();
 
@@ -57,7 +57,7 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
   public: void stopGstThread();
   public: void gstCallback(GstElement *appsrc);
 
-  public: void cbVideoStream(const boost::shared_ptr<const msgs::Int> &_msg);
+  public: void cbVideoStream(const boost::shared_ptr<const msgs::Int32> &_msg);
   private: void startStreaming();
   private: void stopStreaming();
 
@@ -75,12 +75,12 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
   protected: sensors::CameraSensorPtr parentSensor;
   protected: rendering::CameraPtr camera;
 
-  private: event::ConnectionPtr newFrameConnection;
+  private: common::ConnectionPtr newFrameConnection;
 
-  private: transport::NodePtr node_handle_;
+  private: transport::Node node_handle_;
   private: std::string namespace_;
 
-  private: transport::SubscriberPtr mVideoSub;
+  private: transport:: mVideoSub;
   private: pthread_t mThreadId;
   private: const std::string mTopicName = "~/video_stream";
   private: bool mIsActive;
@@ -88,5 +88,3 @@ class GAZEBO_VISIBLE GstCameraPlugin : public SensorPlugin
   GMainLoop *gst_loop;
   GstElement *source;
 };
-
-} /* namespace gazebo */
