@@ -15,16 +15,39 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # --------------------------------------------------------------------------- #
-# Find gz-sim and dependencies.
-find_package(gz-cmake3 REQUIRED)
-set(GZ_CMAKE_VER ${gz-cmake3_VERSION_MAJOR})
+# Find gazebo libs
+set(PACKAGES
+  sdformat13
+  gz-cmake3
+  gz-sim7
+  gz-sensors7
+  gz-math7
+  gz-utils2
+  gz-common5
+  gz-msgs9
+  gz-rendering7
+  gz-transport12
+  gz-plugin2
+  # Add more packages as needed
+)
 
-gz_find_package(gz-sim7 REQUIRED)
-set(GZ_SIM_VER ${gz-sim7_VERSION_MAJOR})
+foreach(PACKAGE ${PACKAGES})
+  find_package(${PACKAGE} REQUIRED)
+endforeach()
 
 # --------------------------------------------------------------------------- #
 # Find RapidJSON.
 find_package(RapidJSON REQUIRED)
+
+# --------------------------------------------------------------------------- #
+# Find GStreamer.
+find_package(PkgConfig REQUIRED)
+pkg_search_module(gstreamer REQUIRED IMPORTED_TARGET gstreamer-1.0>=1.4)
+pkg_search_module(gstreamer-app REQUIRED IMPORTED_TARGET gstreamer-app-1.0>=1.4)
+
+# --------------------------------------------------------------------------- #
+# Find OpenCV.
+find_package(OpenCV REQUIRED)
 
 # --------------------------------------------------------------------------- #
 # Build plugin.
@@ -39,7 +62,7 @@ target_include_directories(ArduPilotPlugin PRIVATE
   include
 )
 target_link_libraries(ArduPilotPlugin PRIVATE
-  gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER}
+  gz-sim7::gz-sim7
 )
 
 add_library(ParachutePlugin
@@ -50,7 +73,31 @@ target_include_directories(ParachutePlugin PRIVATE
   include
 )
 target_link_libraries(ParachutePlugin PRIVATE
-  gz-sim${GZ_SIM_VER}::gz-sim${GZ_SIM_VER}
+  gz-sim7::gz-sim7
+)
+
+add_library(GstCameraPlugin
+    SHARED
+    src/GstCameraPlugin.cc
+)
+target_include_directories(GstCameraPlugin PRIVATE
+  include
+)
+target_link_libraries(GstCameraPlugin PRIVATE
+  ${OpenCV_LIBS}
+  PkgConfig::gstreamer
+  PkgConfig::gstreamer-app
+  sdformat13::sdformat13
+  gz-sim7::gz-sim7
+  gz-sensors7::gz-sensors7
+  gz-sensors7::gz-sensors7-camera
+  gz-math7::gz-math7
+  gz-utils2::gz-utils2
+  gz-common5::gz-common5
+  gz-msgs9::gz-msgs9
+  gz-rendering7::gz-rendering7
+  gz-transport12::gz-transport12
+  gz-plugin2::gz-plugin2
 )
 
 # --------------------------------------------------------------------------- #
