@@ -453,5 +453,61 @@
         </ode>
       </physics>
     </joint>
+  <link name='cam_link'>
+  <pose frame=''>0.0 0.0 -0.0575 -0 1.5708 -0</pose> <!-- <pose frame=''>-0.118317 0.002195 0.004205 -0 1.5708 -0</pose> 3.12703-->
+  <inertial>
+    <mass>0.001</mass>
+    <inertia>
+      <ixx>0.1</ixx>
+      <ixy>0</ixy>
+      <ixz>0</ixz>
+      <iyy>0.1</iyy>
+      <iyz>0</iyz>
+      <izz>0.1</izz>
+    </inertia>
+    <pose frame=''>0 0 0 0 -0 0</pose>
+  </inertial>
+  <self_collide>0</self_collide>
+  <kinematic>0</kinematic>
+  <sensor name='camera1' type='camera'>
+    <camera name="head">
+      <horizontal_fov>1.3962634</horizontal_fov>
+      <image>
+        <width>800</width>
+        <height>600</height>
+        <format>R8G8B8</format>
+      </image>
+      <clip>
+        <near>0.02</near>
+        <far>300</far>
+      </clip>
+    </camera>
+    <always_on>1</always_on>
+    <update_rate>30</update_rate>
+    <visualize>1</visualize>
+    <plugin name="GstCameraPlugin" filename="GstCameraPlugin">
+      <udpPort>9001</udpPort>
+    </plugin>
+  </sensor>
+  <visual name='camera_visual'>
+  <pose>0 0 0 0 -0 0</pose>
+  <geometry>
+    <box>
+      <size>0.02 0.02 0.02</size>
+    </box>
+  </geometry>
+  </visual>
+  </link>
+    <joint name='camera_joint' type='fixed'>
+      <parent>base_link</parent>
+      <child>cam_link</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <upper>-1e+16</upper>
+          <lower>1e+16</lower>
+        </limit>
+      </axis>
+    </joint>
   </model>
 </sdf>
