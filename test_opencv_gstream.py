@@ -3,10 +3,11 @@ import cv2
 pipeline = (
     "udpsrc port=9001 "
     "caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' ! "
-    "rtph264depay ! avdec_h264 ! videoconvert ! appsink drop=true sync=false"
+    "rtph264depay ! avdec_h264 ! videoconvert ! "
+    "appsink drop=true sync=false max-buffers=1 emit-signals=true"
 )
-cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
+cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
 
 if not cap.isOpened():
     print('Error: Unable to open pipeline')

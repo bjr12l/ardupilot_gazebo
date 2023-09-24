@@ -4,13 +4,48 @@ USER root
 
 RUN apt update && apt install -y \
     software-properties-common wget \
-    rapidjson-dev gnupg cmake \
+    rapidjson-dev gnupg build-essential cmake \
+    pkg-config libgtk-3-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev \
+    libxvidcore-dev libx264-dev libjpeg-dev libpng-dev libtiff-dev \
+    gfortran openexr libatlas-base-dev python3-dev python3-numpy \
+    libtbb2 libtbb-dev libdc1394-22-dev \
     libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
     libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base \
     gstreamer1.0-plugins-good gstreamer1.0-plugins-bad \
     gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools \
     gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 \
     gstreamer1.0-qt5 gstreamer1.0-pulseaudio
+
+
+# Install OpenCV
+RUN git clone https://github.com/opencv/opencv.git &&  \
+    git clone https://github.com/opencv/opencv_contrib.git && \
+    cd opencv && mkdir build && cd build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+          -D CMAKE_INSTALL_PREFIX=/usr/local \
+          -D BUILD_PYTHON3=ON \
+          -D BUILD_OPENCV_PYTHON2=OFF \
+          -D ENABLE_CXX11=ON \
+          -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
+          -D BUILD_TIFF=ON \
+          -D WITH_CUDA=OFF \
+          -D ENABLE_AVX=OFF \
+          -D WITH_OPENGL=OFF \
+          -D WITH_OPENCL=OFF \
+          -D WITH_IPP=OFF \
+          -D WITH_TBB=ON \
+          -D BUILD_TBB=ON \
+          -D WITH_V4L=OFF \
+          -D WITH_VTK=OFF \
+          -D BUILD_TESTS=OFF \
+          -D BUILD_PERF_TESTS=OFF \
+          -D BUILD_SHARED_LIBS=ON \
+          -D OPENCV_GENERATE_PKGCONFIG=ON \
+          -D WITH_GSTREAMER=ON \
+          .. && \
+    make -j4 && \
+    make install && \
+    ldconfig
 
 # install Gazebo
 RUN wget https://packages.osrfoundation.org/gazebo.gpg \
