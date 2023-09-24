@@ -37,7 +37,27 @@ Set up an [ArduPilot development environment](https://ardupilot.org/dev/index.ht
 In the following it is assumed that you are able to run ArduPilot SITL using
 the [MAVProxy GCS](https://ardupilot.org/mavproxy/index.html).
 
-## Installation
+## Installation Docker (RECOMMENDED) 
+
+Build the base ardupilot image pointing to the [local ArduPilot](https://ardupilot.org/dev/index.html) directory
+```
+docker build ${ARDUPILOT_HOME} -t ardupilot:latest
+```
+
+Run the simulator using [docker-composy](./docker-compose.yaml) file
+```
+docker compose up simulator
+```
+This will build the image and spin up the simulator. You can edit the commands to run under `command` entry 
+
+### Receiving Images Via GStreamer:
+There is also a gstreamer pipeline to recieve the video from gazebo
+```
+gst-launch-1.0 -v udpsrc port=9001 caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' ! rtph264depay ! avdec_h264 ! videoconvert !  fpsdisplaysink sync=false
+```
+I have also attempted to receive the video directly in python using OpenCV in [this script](./test_opencv_gstream.py), but so far its not working as expected...
+
+## Installation (OLD)
 
 Install additional dependencies:
 
