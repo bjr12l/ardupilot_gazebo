@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+
+  # ardupilot:
+  #   ...
+
+  simulator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ardupilot-gazebo:latest
+    environment:
+      - DISPLAY=:0
+    volumes:
+      - ../ardupilot:${USER_HOME}/ardupilot
+      - .:${USER_HOME}/ardupilot_gazebo_plugin
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    network_mode: host
+    privileged: true
+    stdin_open: true
+    tty: true
+    working_dir: ${USER_HOME}/ardupilot
+    command:
+      - /bin/sh
+      - -c
+      - |
+        cd ardupilot && sim_vehicle.py -v ArduCopter -f gazebo-iris --model JSON --map
+        gz sim -v4 -r --render-engine=ogre iris_runway.sdf
+        gst-launch-1.0 -v udpsrc port=9001 caps='application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264' ! rtph264depay ! avdec_h264 ! videoconvert !  fpsdisplaysink sync=false
+  
+  # gstreamer:
+  #   ...
+
+  # odometry:
+  #   ...
